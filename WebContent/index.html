@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ICAr REST/JSON framework (servlet-based)</title>
+</head>
+<body>
+<h1>ICAr REST/JSON framework (servlet-based)</h1>
+
+<p>
+This REST framework is made of... just 4 classes (+ a basic sample). There are 3 more classes to implement a lightweight JSON parser.
+It allows to easily provide web resources in CRUD mode, as usual in REST style.
+</p>
+
+<p>
+It aims at being mixed in your own code (although you may also include it as any other 3rd-party tool):<br/>
+feel free to take (parts of) the code, rename packages/classes, add new functionalities, fix whatever you consider a bug...
+and mix the result in your own project.
+</p>
+
+<p>To make it possible, this code is covered by a BSD license.</p>
+
+<h2>Quick start</h2>
+
+<p>
+This project is itself a web application: when deployed on a servlet container, the sample described below should be up and running (links are provided).<br/>
+So, try to export it as a .war package, deploy it on your app server, and open the webapp in a web browser (this page should be displayed).
+</p>
+
+<p>
+Then have a look at the rest.sample package. There is a servlet that registers 2 resources:
+<ul>
+<li>The 1st one, "HelloWorldResource", displays a message (and is registered as "<a href="demo/hello">/demo/hello</a>" by the servlet).</li>
+<li>The 2nd one, "DisplayNameResource", expects a HTTP parameter called "name" to display a greeting message (and is registered as "<a href="demo/greetings?name=">/demo/greetings</a>" by the servlet).</li> 
+</ul>
+Then, the servlet is declared in WEB-INF/web.xml (with url-pattern set to "/demo/*"), and that's all.
+</p>
+</body>
+</html>
