@@ -3,7 +3,6 @@ package cades.icar.rest.sample;
 import cades.icar.rest.resource.RestResource;
 import cades.icar.rest.servlet.RequestContext;
 
-
 public class DisplayNameResource extends RestResource {
 
 	public DisplayNameResource(String name) {
@@ -11,6 +10,10 @@ public class DisplayNameResource extends RestResource {
 		setContentType("text/html");
 	}
 
+	/**
+	 * HTTP GET method
+	 * URL may end with /<name> or provide HTTP parameter name=<name>
+	 */
 	@Override
 	public String onGet(String operation, RequestContext ctx) {
 		String name = ctx.getServletRequest().getParameter("name");
