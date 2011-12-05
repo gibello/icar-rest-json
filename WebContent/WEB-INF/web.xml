@@ -12,6 +12,7 @@
     <servlet-name>DemoRestServlet</servlet-name>
     <servlet-class>cades.icar.rest.sample.DemoRestServlet</servlet-class>
   </servlet>
+  <!-- Note: a url-pattern set to /* would perfectly work... except for static .html files ! -->
   <servlet-mapping>
     <servlet-name>DemoRestServlet</servlet-name>
     <url-pattern>/demo/*</url-pattern>
