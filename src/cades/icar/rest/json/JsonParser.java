@@ -20,7 +20,7 @@ public class JsonParser {
 	private static final int VALUE = 4;
 	private static final int KEY = 8;
 
-	public void parse(InputStream in, EventHandler handler) throws IOException {
+	public void parse(InputStream in, EventHandler handler) throws Exception {
 		int expect = OBJECT | ARRAY;
 		int status = 0, mainIndex = 0;;
 		boolean firstval = true;
@@ -97,7 +97,7 @@ public class JsonParser {
 				break;
 			case ' ' :
 			case '\t' :
-				if(status == VALUE && currentValue_.length() > 0) {
+				if((expect & VALUE) != 0 && currentValue_.length() > 0) {
 					currentValue_.append((char)c);
 				}
 				// else ignore
