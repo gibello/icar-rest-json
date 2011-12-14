@@ -6,14 +6,14 @@ package cades.icar.rest.json;
  */
 public interface EventHandler {
 	
-	public void startParsing(JsonParser parser);
-	public void endParsing();
+	public void startParsing(JsonParser parser) throws Exception;
+	public void endParsing() throws Exception;
 	
-	public void startObject();
-	public void endObject();
-	public void startArray();
-	public void endArray();
+	public void startObject() throws Exception;
+	public void endObject() throws Exception;
+	public void startArray() throws Exception;
+	public void endArray() throws Exception;
 
-	public void key(String key);
-	public void simpleValue(String val);
+	public void key(String key) throws Exception;
+	public void simpleValue(String val) throws Exception;
 }

@@ -7,26 +7,26 @@ package cades.icar.rest.json;
 public class DefaultHandler implements EventHandler {
 
 	@Override
-	public void startParsing(JsonParser parser) { }
+	public void startParsing(JsonParser parser) throws Exception { }
 
 	@Override
-	public void endParsing() { }
+	public void endParsing() throws Exception { }
 
 	@Override
-	public void startObject() { }
+	public void startObject() throws Exception { }
 
 	@Override
-	public void endObject() { }
+	public void endObject() throws Exception { }
 
 	@Override
-	public void key(String key) { }
+	public void key(String key) throws Exception { }
 
 	@Override
-	public void simpleValue(String val) { }
+	public void simpleValue(String val) throws Exception { }
 
 	@Override
-	public void startArray() { }
+	public void startArray() throws Exception { }
 
 	@Override
-	public void endArray() { }
+	public void endArray() throws Exception { }
 }
