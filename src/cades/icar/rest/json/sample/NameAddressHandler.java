@@ -1,9 +1,12 @@
 package cades.icar.rest.json.sample;
 
 import java.io.ByteArrayInputStream;
-
 import cades.icar.rest.json.JsonParser;
 
+/**
+ * This example parses JSON-encoded name/address information, with the following format:
+ * { name: "My name", address: { city: "My city", country: "My country" } }
+ */
 public class NameAddressHandler extends cades.icar.rest.json.DefaultHandler {
 	
 	String name_;
@@ -38,10 +41,12 @@ public class NameAddressHandler extends cades.icar.rest.json.DefaultHandler {
 		else if("country".equals(lastKey_)) country_ = val;
 	}
 
+	// Specific method (not from the EventHandler interface)
 	public NameAddress getResult() {
 		return new NameAddress(name_, city_, country_);
 	}
 
+	// Test main program.
 	public static void main(String args[]) throws Exception {
 		JsonParser parser = new JsonParser();
 	    NameAddressHandler handler = new NameAddressHandler();
@@ -51,6 +56,7 @@ public class NameAddressHandler extends cades.icar.rest.json.DefaultHandler {
 	}
 }
 
+// Class that represents a name/address information (name, city, country) and formats it.
 class NameAddress {
 
 	String name_;
