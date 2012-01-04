@@ -3,6 +3,8 @@ ICAr REST/JSON framework
 
 License: BSD (post-1999), means "as close as possible to public domain".
 
+Documentation: https://github.com/gibello/icar-rest-json/wiki
+
 Features:
 - Servlet-based REST framework
 - JSON push parser (SAX-like).
