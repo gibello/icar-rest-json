@@ -3,17 +3,20 @@ package cades.icar.rest.json;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cades.icar.rest.json.EventHandler;
+
 /**
  * JSON push parser (looks like XML sax parsing).
  * @author Pierre-Yves Gibello
  */
 public class JsonParser {
-
-	StringBuffer currentValue_ = new StringBuffer();
-	int level_ = 0;
-	int stack_[] = new int[512];
-	boolean record_;
-	StringBuilder recordBuffer_ = new StringBuilder();
+	
+	StringBuffer currentValue = new StringBuffer();
+	int level = 0;
+	int stack[] = new int[512];
+	boolean record;
+	StringBuilder recordBuffer = new StringBuilder();
+	boolean quoted = false;
 	
 	private static final int OBJECT = 1;
 	private static final int ARRAY = 2;
@@ -24,16 +27,21 @@ public class JsonParser {
 		int expect = OBJECT | ARRAY;
 		int status = 0, mainIndex = 0;;
 		boolean firstval = true;
-		int c;
+		int c = 0;
+		int prevc = 0;
 
 		handler.startParsing(this);
 
 		while((c = in.read()) > 0) {
 			mainIndex++;
 
-			if(record_) recordBuffer_.append((char)c);
+			if(record) this.recordBuffer.append((char)c);
 			switch((char)c) {
 			case '{' :
+				if(this.quoted) {
+					currentValue(c);
+					break;
+				}
 				firstval = true;
 				if((expect & OBJECT) == 0) throw new IOException("Unexpected { at index " + mainIndex);
 				handler.startObject();
@@ -42,21 +50,26 @@ public class JsonParser {
 				expect = KEY;
 				break;
 			case '}' :
+				if(this.quoted) {
+					currentValue(c);
+					break;
+				}
 				firstval = false;
 				if((expect & VALUE) != 0) {
-					handler.simpleValue(stripQuotes(currentValue_.toString()));
-					currentValue_ = new StringBuffer();
+					handler.simpleValue(stripQuotes(this.currentValue.toString()));
+					this.currentValue = new StringBuffer();
 				}
 				handler.endObject();
 				
 				status = popStatus();
 				if(status == OBJECT) expect = KEY;
-				else {
-					expect = OBJECT | ARRAY;
-					if(status == ARRAY) expect |= VALUE;
-				}
+				else expect = OBJECT | ARRAY;
 				break;
 			case '[' :
+				if(this.quoted) {
+					currentValue(c);
+					break;
+				}
 				firstval = true;
 				if((expect & ARRAY) == 0) throw new IOException("Unexpected [ at index " + mainIndex);
 				handler.startArray();
@@ -65,10 +78,14 @@ public class JsonParser {
 				expect = VALUE | OBJECT | ARRAY;
 				break;
 			case ']' :
+				if(this.quoted) {
+					currentValue(c);
+					break;
+				}
 				firstval = false;
 				if((expect & VALUE) != 0) {
-					handler.simpleValue(stripQuotes(currentValue_.toString()));
-					currentValue_ = new StringBuffer();
+					handler.simpleValue(stripQuotes(this.currentValue.toString()));
+					this.currentValue = new StringBuffer();
 				}
 				handler.endArray();
 				
@@ -79,26 +96,34 @@ public class JsonParser {
 				else if(status == OBJECT) expect |= KEY;
 				break;
 			case ',' :
-				if(firstval && currentValue_.length() <= 0) throw new IOException("Unexpected comma at index " + mainIndex);
-				else if((expect & KEY) != 0 && (firstval || currentValue_.length()>0)) throw new IOException("Unexpected comma at index " + mainIndex);
-				else if((expect & VALUE) != 0) handler.simpleValue(stripQuotes(currentValue_.toString()));
-				
+				if(this.quoted) {
+					currentValue(c);
+					break;
+				}
+				if(firstval && this.currentValue.length() <= 0) throw new IOException("Unexpected comma at index " + mainIndex);
+				else if((expect & KEY) != 0 && (firstval || this.currentValue.length()>0)) throw new IOException("Unexpected comma at index " + mainIndex);
+				else if((expect & VALUE) != 0) {
+					if(! this.quoted) handler.simpleValue(stripQuotes(this.currentValue.toString()));
+				}
+
 				if(status == OBJECT) expect = KEY;
 				else if(status == ARRAY) expect = VALUE | OBJECT | ARRAY;
 				else throw new IOException("Unexpected comma");
-				currentValue_ = new StringBuffer();
+				this.currentValue = new StringBuffer();
 				firstval = false;
 				break;
 			case ':' :
-				if((expect & KEY) == 0 || currentValue_.length() <= 0) throw new IOException("Unexpected colon at index " + mainIndex);
-				handler.key(stripQuotes(currentValue_.toString()));
-				expect = VALUE | OBJECT | ARRAY;
-				currentValue_ = new StringBuffer();
+				if(((expect & KEY) == 0 && !this.quoted) || this.currentValue.length() <= 0) throw new IOException("Unexpected colon at index " + mainIndex);
+				if(! this.quoted) {
+					handler.key(stripQuotes(this.currentValue.toString()));
+					expect = VALUE | OBJECT | ARRAY;
+					this.currentValue = new StringBuffer();
+				} else currentValue(c);
 				break;
 			case ' ' :
 			case '\t' :
-				if((expect & VALUE) != 0 && currentValue_.length() > 0) {
-					currentValue_.append((char)c);
+				if((expect & VALUE) != 0 && this.currentValue.length() > 0) {
+					currentValue(c);
 				}
 				// else ignore
 				break;
@@ -106,48 +131,57 @@ public class JsonParser {
 			case '\n' :
 				// ignore
 				break;
+			case '\"':
+				if((prevc == '\\' && this.quoted)) currentValue(c);
+				else this.quoted = !this.quoted;
+				break;
 			default :
-				//System.out.println(status);
 				if((expect & (VALUE | KEY)) == 0) throw new IOException("Unexpected character: " + (char)c + " at index " + mainIndex);
-				currentValue_.append((char)c);
+				currentValue(c);
 				break;
 			}
+			
+			prevc = c;
 		}
 		
 		handler.endParsing();
 	}
 	
 	public void startRecording(String prefix) {
-		recordBuffer_.setLength(0);
-		if(prefix != null) recordBuffer_.append(prefix);
-		record_ = true;
+		this.recordBuffer.setLength(0);
+		if(prefix != null) this.recordBuffer.append(prefix);
+		this.record = true;
 	}
-	public boolean isRecording() { return record_; }
+	public boolean isRecording() { return this.record; }
 	public String endRecording() {
-		record_ = false;
-		return recordBuffer_.toString();
+		this.record = false;
+		return this.recordBuffer.toString();
 	}
 	
 		
 	private int pushStatus(int status) throws IOException {
-		if(level_ >= stack_.length-1) throw new IOException("Stack overflow");
-		stack_[++ level_] = status;
+		if(this.level >= this.stack.length-1) throw new IOException("Stack overflow");
+		this.stack[++ this.level] = status;
 		return status;
 	}
 	
 	private int popStatus() {
-		if(level_ <= 0) {
-			level_ = 0;
+		if(this.level <= 0) {
+			this.level = 0;
 			return 0;
 		}
-		return stack_[-- level_ ];
+		return this.stack[-- this.level ];
 	}
 	
+	private void currentValue(int c) {
+		this.currentValue.append((char)c);
+	}
+
 	private String stripQuotes(String val) {
     	val = val.trim();
     	if(val.startsWith("\"")) val = val.substring(1);
 		if(val.endsWith("\"")) val = val.substring(0, val.length()-1);
 		return val;
     }
-
+	
 }

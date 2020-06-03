@@ -13,7 +13,7 @@ public class HelloWorldResource extends RestResource {
 
 	@Override
 	public String onGet(String operation, RequestContext ctx) {
-		return "{ greetings: \"Hello world\" }";
+		return "{ \"greetings\": \"Hello world\" }";
 	}
 
 	@Override
