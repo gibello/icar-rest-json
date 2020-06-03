@@ -14,6 +14,6 @@ Each feature is standalone and may be used independently, is designed in a minim
 
 The code may be cloned and embedded in your own code base, then modified to fit your needs.
 
-The ICAr REST framework was developed in 2011 for the needs of the CADES project
-(a software suite for design and optimization of physical systems), on behalf of EBM Websourcing company.
-It was financed by public funding from a french research project (ANR Siminthec).
+The ICAr REST framework was initially developed in 2011 for the needs of the CADES project
+(a software suite for design and optimization of physical systems),
+financed by public funding from a french research project (ANR Siminthec).
