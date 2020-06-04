@@ -1,5 +1,6 @@
-ICAr REST/JSON framework
-========================
+## ICAr REST/JSON framework
+
+# NOTE: For JSON parsing, superseded by [icar-json](https://github.com/gibello/icar-json), as of June 3, 2020 (REST remains unchanged).
 
 License: BSD (post-1999), means "as close as possible to public domain".
 
